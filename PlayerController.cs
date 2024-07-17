@@ -2,11 +2,13 @@ using Godot;
 
 public class PlayerController : KinematicBody2D
 {
+	public int health = 3;
 	private int _speed = 200;
 	private int _jumpForce = 200;
 	private int _gravity = 400;
 
-	private bool _isDashing, _isDashAvailable, _isClimbing, _isClimbAvailable, _isWallJumping, _isInAir;
+	private bool _isDashing, _isDashAvailable, _isClimbing, _isClimbAvailable, _isWallJumping, _isInAir,
+		_isTakingDamage;
 
 	private int _dashSpeed = 600;
 	private float _dashTimer = .2f;
@@ -22,6 +24,7 @@ public class PlayerController : KinematicBody2D
 
 	private float _friction = .1f;
 	private float _acceleration = .5f;
+	private int facingDirection = 0;
 
 	private Vector2 _velocity;
 
@@ -44,6 +47,8 @@ public class PlayerController : KinematicBody2D
 
 	public override void _Process(float delta)
 	{
+		if (health == 0) return;
+		
 		if (!_isDashing && !_isWallJumping)
 		{
 			ProcessMovement();
@@ -54,8 +59,8 @@ public class PlayerController : KinematicBody2D
 			if (Input.IsActionJustPressed("jump"))
 			{
 				_velocity.y = -_jumpForce;
-				animatedSprite.Play("jump");
 				_isInAir = true;
+				animatedSprite.Play("jump");
 			}
 			else
 			{
@@ -65,7 +70,10 @@ public class PlayerController : KinematicBody2D
 			_isClimbAvailable = true;
 			_isDashAvailable = true;
 		}
-		else ProcessWallJump(delta);
+		else
+		{
+			ProcessWallJump(delta);
+		}
 
 		if (_isClimbAvailable && !_isWallJumping && Input.IsActionPressed("climb"))
 		{
@@ -84,6 +92,9 @@ public class PlayerController : KinematicBody2D
 			_dashTimer -= delta;
 
 			GhostPlayer ghost = GhostPLayerInstance.Instance() as GhostPlayer;
+			Owner.AddChild(ghost);
+			ghost.GlobalPosition = this.GlobalPosition;
+			ghost.GetNode<Sprite>("Sprite").FlipH = animatedSprite.FlipH;
 
 			if (_dashTimer <= 0)
 			{
@@ -113,29 +124,39 @@ public class PlayerController : KinematicBody2D
 
 	private void ProcessMovement()
 	{
-		var direction = 0;
+		facingDirection = 0;
 
-		if (Input.IsActionPressed("ui_left"))
+		if (!_isTakingDamage)
 		{
-			direction -= 1;
-			animatedSprite.FlipH = true;
+			if (Input.IsActionPressed("ui_left"))
+			{
+				facingDirection -= 1;
+				animatedSprite.FlipH = true;
+			}
+
+			if (Input.IsActionPressed("ui_right"))
+			{
+				facingDirection += 1;
+				animatedSprite.FlipH = false;
+			}
 		}
 
-		if (Input.IsActionPressed("ui_right"))
+		if (facingDirection != 0)
 		{
-			direction += 1;
-			animatedSprite.FlipH = false;
-		}
+			_velocity.x = Mathf.Lerp(_velocity.x, facingDirection * _speed, _acceleration);
 
-		if (direction != 0)
-		{
-			_velocity.x = Mathf.Lerp(_velocity.x, direction * _speed, _acceleration);
 			if (!_isInAir) animatedSprite.Play("run");
 		}
 		else
 		{
-			if (!_isInAir) animatedSprite.Play("idle");
 			_velocity.x = Mathf.Lerp(_velocity.x, 0, _friction);
+			
+			if (_velocity.x < 5 && _velocity.x > -5)
+			{
+				if (!_isInAir) animatedSprite.Play("idle");
+				
+				_isTakingDamage = false;
+			} 
 		}
 	}
 	private void ProcessDash()
@@ -149,12 +170,14 @@ public class PlayerController : KinematicBody2D
 		{
 			_velocity.x = _dashSpeed;
 			_velocity.y = -_dashSpeed;
+			animatedSprite.Play("jump");
 		}
 
 		if (Input.IsActionPressed("ui_left") && Input.IsActionPressed("ui_up"))
 		{
 			_velocity.x = -_dashSpeed;
 			_velocity.y = -_dashSpeed;
+			animatedSprite.Play("jump");
 		}
 
 		_dashTimer = DashTimerReset;
@@ -208,6 +231,30 @@ public class PlayerController : KinematicBody2D
 				_isWallJumping = false;
 				_wallJumpTimer = WallJumpTimerReset;
 			}
+		}
+	}
+
+	public void TakeDamage()
+	{
+		health -= 1;
+		_velocity = MoveAndSlide(new Vector2(500 * -facingDirection, -80), Vector2.Up);
+		_isTakingDamage = true;
+		animatedSprite.Play("takeDamage");
+		GD.Print(health);
+
+		if (health <= 0)
+		{
+			health = 0;
+			GD.Print("Player has die");
+			animatedSprite.Play("death");
+		}
+	}
+
+	private void _on_AnimatedSprite_animation_finished()
+	{
+		if (animatedSprite.Animation == "death")
+		{
+			GetTree().ReloadCurrentScene();
 		}
 	}
 }

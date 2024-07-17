@@ -13,6 +13,11 @@ public class GhostPlayer : Node2D
         GetNode<AnimationPlayer>("AnimationPlayer").Play("FadeOut");
     }
 
+    public void Destroy()
+    {
+        QueueFree();
+    }
+
 //  // Called every frame. 'delta' is the elapsed time since the previous frame.
 //  public override void _Process(float delta)
 //  {

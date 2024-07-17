@@ -1,8 +1,11 @@
-[gd_scene load_steps=34 format=2]
+[gd_scene load_steps=55 format=2]
 
 [ext_resource path="res://AnimationSheet_Character.png" type="Texture" id=1]
 [ext_resource path="res://tileset.png" type="Texture" id=2]
 [ext_resource path="res://PlayerController.cs" type="Script" id=3]
+[ext_resource path="res://GhostPlayer.tscn" type="PackedScene" id=4]
+[ext_resource path="res://2D Pixel Dungeon Asset Pack/items and trap_animation/peaks/peaks_1.png" type="Texture" id=5]
+[ext_resource path="res://SpikeTrap.cs" type="Script" id=6]
 
 [sub_resource type="ConvexPolygonShape2D" id=1]
 points = PoolVector2Array( 0, 0, 16, 0, 16, 16, 0, 16 )
@@ -137,6 +140,38 @@ region = Rect2( 192, 256, 32, 32 )
 atlas = ExtResource( 1 )
 region = Rect2( 224, 256, 32, 32 )
 
+[sub_resource type="AtlasTexture" id=48]
+atlas = ExtResource( 1 )
+region = Rect2( 0, 224, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=49]
+atlas = ExtResource( 1 )
+region = Rect2( 32, 224, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=50]
+atlas = ExtResource( 1 )
+region = Rect2( 64, 224, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=51]
+atlas = ExtResource( 1 )
+region = Rect2( 96, 224, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=52]
+atlas = ExtResource( 1 )
+region = Rect2( 128, 224, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=53]
+atlas = ExtResource( 1 )
+region = Rect2( 160, 224, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=54]
+atlas = ExtResource( 1 )
+region = Rect2( 192, 224, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=55]
+atlas = ExtResource( 1 )
+region = Rect2( 224, 224, 32, 32 )
+
 [sub_resource type="AtlasTexture" id=33]
 atlas = ExtResource( 1 )
 region = Rect2( 0, 0, 32, 32 )
@@ -152,6 +187,30 @@ region = Rect2( 0, 32, 32, 32 )
 [sub_resource type="AtlasTexture" id=36]
 atlas = ExtResource( 1 )
 region = Rect2( 32, 32, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=56]
+atlas = ExtResource( 1 )
+region = Rect2( 0, 128, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=57]
+atlas = ExtResource( 1 )
+region = Rect2( 32, 128, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=58]
+atlas = ExtResource( 1 )
+region = Rect2( 64, 128, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=59]
+atlas = ExtResource( 1 )
+region = Rect2( 96, 128, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=60]
+atlas = ExtResource( 1 )
+region = Rect2( 128, 128, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=61]
+atlas = ExtResource( 1 )
+region = Rect2( 160, 128, 32, 32 )
 
 [sub_resource type="AtlasTexture" id=46]
 atlas = ExtResource( 1 )
@@ -197,14 +256,31 @@ region = Rect2( 192, 96, 32, 32 )
 atlas = ExtResource( 1 )
 region = Rect2( 224, 96, 32, 32 )
 
+[sub_resource type="AtlasTexture" id=62]
+atlas = ExtResource( 1 )
+region = Rect2( 0, 192, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=63]
+atlas = ExtResource( 1 )
+region = Rect2( 32, 192, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=64]
+atlas = ExtResource( 1 )
+region = Rect2( 64, 192, 32, 32 )
+
 [sub_resource type="SpriteFrames" id=10]
 animations = [ {
 "frames": [ SubResource( 25 ), SubResource( 26 ), SubResource( 27 ), SubResource( 28 ), SubResource( 29 ), SubResource( 30 ), SubResource( 31 ), SubResource( 32 ) ],
-"loop": true,
+"loop": false,
 "name": "attack",
 "speed": 10.0
 }, {
-"frames": [ SubResource( 33 ), SubResource( 34 ), SubResource( 35 ), SubResource( 36 ) ],
+"frames": [ SubResource( 48 ), SubResource( 49 ), SubResource( 50 ), SubResource( 51 ), SubResource( 52 ), SubResource( 53 ), SubResource( 54 ), SubResource( 55 ) ],
+"loop": false,
+"name": "death",
+"speed": 5.0
+}, {
+"frames": [ SubResource( 33 ), SubResource( 34 ), SubResource( 35 ), SubResource( 36 ), SubResource( 56 ), SubResource( 57 ), SubResource( 58 ), SubResource( 59 ), SubResource( 60 ), SubResource( 61 ) ],
 "loop": true,
 "name": "idle",
 "speed": 5.0
@@ -218,7 +294,15 @@ animations = [ {
 "loop": true,
 "name": "run",
 "speed": 13.0
+}, {
+"frames": [ SubResource( 62 ), SubResource( 63 ), SubResource( 64 ) ],
+"loop": false,
+"name": "takeDamage",
+"speed": 5.0
 } ]
+
+[sub_resource type="RectangleShape2D" id=65]
+extents = Vector2( 8, 8 )
 
 [node name="Level" type="Node2D"]
 
@@ -234,6 +318,7 @@ script = ExtResource( 3 )
 __meta__ = {
 "_edit_group_": true
 }
+GhostPLayerInstance = ExtResource( 4 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
 position = Vector2( -1, -0.243648 )
@@ -243,7 +328,7 @@ shape = SubResource( 24 )
 [node name="AnimatedSprite" type="AnimatedSprite" parent="Player"]
 scale = Vector2( 0.7, 0.7 )
 frames = SubResource( 10 )
-animation = "jump"
+animation = "takeDamage"
 
 [node name="Camera2D" type="Camera2D" parent="Player"]
 position = Vector2( -1, -3 )
@@ -273,3 +358,21 @@ position = Vector2( 0, 10 )
 rotation = -1.5708
 enabled = true
 cast_to = Vector2( 0, 15 )
+
+[node name="SpikeTrap" type="Node2D" parent="."]
+position = Vector2( 184, -8 )
+script = ExtResource( 6 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="SpikeTrap"]
+texture = ExtResource( 5 )
+
+[node name="Area2D" type="Area2D" parent="SpikeTrap"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SpikeTrap/Area2D"]
+shape = SubResource( 65 )
+
+[connection signal="animation_finished" from="Player/AnimatedSprite" to="Player" method="_on_AnimatedSprite_animation_finished"]
+[connection signal="body_entered" from="SpikeTrap/Area2D" to="SpikeTrap" method="_on_Area2D_body_entered"]
