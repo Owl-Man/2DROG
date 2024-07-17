@@ -6,7 +6,7 @@ public class PlayerController : KinematicBody2D
 	private int _jumpForce = 200;
 	private int _gravity = 400;
 
-	private bool _isDashing, _isDashAvailable, _isClimbing, _isClimbAvailable, _isWallJumping;
+	private bool _isDashing, _isDashAvailable, _isClimbing, _isClimbAvailable, _isWallJumping, _isInAir;
 
 	private int _dashSpeed = 600;
 	private float _dashTimer = .2f;
@@ -25,15 +25,21 @@ public class PlayerController : KinematicBody2D
 
 	private Vector2 _velocity;
 
-	private RayCast2D RayCastLeft, RayCastRight;
-	private RayCast2D RayCastLeftClimb, RayCastRightClimb;
+	private RayCast2D _rayCastLeft, _rayCastRight;
+	private RayCast2D _rayCastLeftClimb, _rayCastRightClimb;
+
+	private AnimatedSprite animatedSprite;
+
+	[Export] public PackedScene GhostPLayerInstance;
 
 	public override void _Ready()
 	{
-		RayCastLeft = GetNode<RayCast2D>("RayCastLeft");
-		RayCastRight = GetNode<RayCast2D>("RayCastRight");
-		RayCastLeftClimb = GetNode<RayCast2D>("RayCastLeftClimb");
-		RayCastRightClimb = GetNode<RayCast2D>("RayCastRightClimb");
+		_rayCastLeft = GetNode<RayCast2D>("RayCastLeft");
+		_rayCastRight = GetNode<RayCast2D>("RayCastRight");
+		_rayCastLeftClimb = GetNode<RayCast2D>("RayCastLeftClimb");
+		_rayCastRightClimb = GetNode<RayCast2D>("RayCastRightClimb");
+
+		animatedSprite = GetNode<AnimatedSprite>("AnimatedSprite");
 	}
 
 	public override void _Process(float delta)
@@ -48,6 +54,12 @@ public class PlayerController : KinematicBody2D
 			if (Input.IsActionJustPressed("jump"))
 			{
 				_velocity.y = -_jumpForce;
+				animatedSprite.Play("jump");
+				_isInAir = true;
+			}
+			else
+			{
+				_isInAir = false;
 			}
 
 			_isClimbAvailable = true;
@@ -70,6 +82,8 @@ public class PlayerController : KinematicBody2D
 		if (_isDashing)
 		{
 			_dashTimer -= delta;
+
+			GhostPlayer ghost = GhostPLayerInstance.Instance() as GhostPlayer;
 
 			if (_dashTimer <= 0)
 			{
@@ -104,16 +118,25 @@ public class PlayerController : KinematicBody2D
 		if (Input.IsActionPressed("ui_left"))
 		{
 			direction -= 1;
+			animatedSprite.FlipH = true;
 		}
 
 		if (Input.IsActionPressed("ui_right"))
 		{
 			direction += 1;
+			animatedSprite.FlipH = false;
 		}
 
-		_velocity.x = direction != 0
-			? Mathf.Lerp(_velocity.x, direction * _speed, _acceleration)
-			: Mathf.Lerp(_velocity.x, 0, _friction);
+		if (direction != 0)
+		{
+			_velocity.x = Mathf.Lerp(_velocity.x, direction * _speed, _acceleration);
+			if (!_isInAir) animatedSprite.Play("run");
+		}
+		else
+		{
+			if (!_isInAir) animatedSprite.Play("idle");
+			_velocity.x = Mathf.Lerp(_velocity.x, 0, _friction);
+		}
 	}
 	private void ProcessDash()
 	{
@@ -139,8 +162,8 @@ public class PlayerController : KinematicBody2D
 	}
 	private void ProcessClimb(float delta)
 	{
-		if (RayCastLeftClimb.IsColliding() || RayCastRightClimb.IsColliding() || RayCastLeft.IsColliding()
-		    || RayCastRight.IsColliding())
+		if (_rayCastLeftClimb.IsColliding() || _rayCastRightClimb.IsColliding() || _rayCastLeft.IsColliding()
+		    || _rayCastRight.IsColliding())
 		{
 			_isClimbing = true;
 
@@ -161,17 +184,19 @@ public class PlayerController : KinematicBody2D
 	}
 	private void ProcessWallJump(float delta)
 	{
-		if (Input.IsActionJustPressed("jump") && RayCastLeft.IsColliding())
+		if (Input.IsActionJustPressed("jump") && _rayCastLeft.IsColliding())
 		{
 			_velocity.y = -_jumpForce;
 			_velocity.x = _jumpForce;
 			_isWallJumping = true;
+			animatedSprite.FlipH = false;
 		}
-		else if (Input.IsActionJustPressed("jump") && RayCastRight.IsColliding())
+		else if (Input.IsActionJustPressed("jump") && _rayCastRight.IsColliding())
 		{
 			_velocity.y = -_jumpForce;
 			_velocity.x = -_jumpForce;
 			_isWallJumping = true;
+			animatedSprite.FlipH = true;
 		}
 
 		if (_isWallJumping)
