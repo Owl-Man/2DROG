@@ -4,16 +4,13 @@ public class Room : TileMap
 {
     [Export] 
     public PackedScene room;
-
-    private bool isGeneratedNewRoom;
     
     private bool isRightOrLeftPlayerComing;
     private bool isRightPlayerComing;
     
-    public override void _Ready()
+    /*public override void _Ready()
     {
-        GD.Randomize();
-    }
+    }*/
 
     private void GenerateNextRoom(bool isRight)
     {
@@ -25,13 +22,15 @@ public class Room : TileMap
         
         if (isRight)
         {
-            nextRoom.GlobalPosition = new Vector2(nextRoom.GlobalPosition.x + 304, nextRoom.GlobalPosition.y);
+            nextRoom.GlobalPosition = new Vector2(nextRoom.GlobalPosition.x + 330, nextRoom.GlobalPosition.y);
             nextRoom.isRightPlayerComing = true;
+            nextRoom.GetNode<Position2D>("doorway1").QueueFree();
         }
         else
         {
-            nextRoom.GlobalPosition = new Vector2(nextRoom.GlobalPosition.x - 304, nextRoom.GlobalPosition.y);
+            nextRoom.GlobalPosition = new Vector2(nextRoom.GlobalPosition.x - 330, nextRoom.GlobalPosition.y);
             nextRoom.isRightPlayerComing = false;
+            nextRoom.GetNode<Position2D>("doorway2").QueueFree();
         }
         
         GD.Print("generated");
@@ -41,11 +40,9 @@ public class Room : TileMap
     {
         if (body is PlayerController)
         {
-            if (isGeneratedNewRoom) return;
             if (isRightOrLeftPlayerComing && !isRightPlayerComing) return;
             
             GenerateNextRoom(false);
-            isGeneratedNewRoom = true;
         }
     }
 
@@ -53,11 +50,9 @@ public class Room : TileMap
     {
         if (body is PlayerController)
         {
-            if (isGeneratedNewRoom) return;
             if (isRightOrLeftPlayerComing && isRightPlayerComing) return;
             
             GenerateNextRoom(true);
-            isGeneratedNewRoom = true;
         } 
     }
 }

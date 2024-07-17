@@ -198,12 +198,12 @@ shape = SubResource( 17 )
 [node name="doorway2" type="Position2D" parent="."]
 position = Vector2( 152, 0 )
 
-[node name="detectionZone" type="Area2D" parent="doorway2"]
+[node name="detectionZone2" type="Area2D" parent="doorway2"]
 position = Vector2( 152, 0 )
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="doorway2/detectionZone"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="doorway2/detectionZone2"]
 position = Vector2( -152, -72 )
 shape = SubResource( 17 )
 
 [connection signal="body_entered" from="doorway1/detectionZone" to="." method="_on_detectionZoneLeft_body_entered"]
-[connection signal="body_entered" from="doorway2/detectionZone" to="." method="_on_detectionZoneRight_body_entered"]
+[connection signal="body_entered" from="doorway2/detectionZone2" to="." method="_on_detectionZoneRight_body_entered"]

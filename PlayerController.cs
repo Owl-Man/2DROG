@@ -37,6 +37,8 @@ public class PlayerController : KinematicBody2D
 
 	public override void _Ready()
 	{
+		GD.Randomize();
+		
 		_rayCastLeft = GetNode<RayCast2D>("RayCastLeft");
 		_rayCastRight = GetNode<RayCast2D>("RayCastRight");
 		_rayCastLeftClimb = GetNode<RayCast2D>("RayCastLeftClimb");
