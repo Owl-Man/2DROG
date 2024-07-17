@@ -6,11 +6,14 @@ public class PlayerController : KinematicBody2D
 	private int _jumpForce = 200;
 	private int _gravity = 400;
 
-	private bool _isDashing, _isDashAvailable, _canClimb, _isClimbing, _isWallJumping;
+	private bool _isDashing, _isDashAvailable, _isClimbing, _isClimbAvailable, _isWallJumping;
 
 	private int _dashSpeed = 600;
 	private float _dashTimer = .2f;
 	private const float DashTimerReset = .2f;
+
+	private float _climbTimer = 5f;
+	private const float ClimbTimerReset = 5f;
 	
 	private float _wallJumpTimer = .4f;
 	private const float WallJumpTimerReset = .4f;
@@ -47,23 +50,23 @@ public class PlayerController : KinematicBody2D
 				_velocity.y = -_jumpForce;
 			}
 
-			_canClimb = true;
+			_isClimbAvailable = true;
 			_isDashAvailable = true;
 		}
+		else ProcessWallJump(delta);
 
-		if (_canClimb && Input.IsActionPressed("climb"))
+		if (_isClimbAvailable && !_isWallJumping && Input.IsActionPressed("climb"))
 		{
 			ProcessClimb(delta);
 		}
 		else _isClimbing = false;
 
-		ProcessWallJump(delta);
-
 		if (_isDashAvailable && Input.IsActionJustPressed("dash"))
 		{
 			ProcessDash();
 		}
-
+		
+		//States
 		if (_isDashing)
 		{
 			_dashTimer -= delta;
@@ -77,6 +80,18 @@ public class PlayerController : KinematicBody2D
 		else if (!_isClimbing)
 		{
 			_velocity.y += _gravity * delta;
+		}
+		else
+		{
+			_climbTimer -= delta;
+
+			if (_climbTimer <= 0)
+			{
+				_isClimbing = false;
+				_isClimbAvailable = false;
+
+				_climbTimer = ClimbTimerReset;
+			}
 		}
 		
 		MoveAndSlide(_velocity, Vector2.Up);
