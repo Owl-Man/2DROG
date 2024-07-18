@@ -1,58 +1,80 @@
+using System;
+using System.Threading.Tasks;
 using Godot;
 
 public class Room : TileMap
 {
-    [Export] 
-    public PackedScene room;
-    
-    private bool isRightOrLeftPlayerComing;
-    private bool isRightPlayerComing;
-    
-    /*public override void _Ready()
-    {
-    }*/
+    [Export] public PackedScene room;
 
-    private void GenerateNextRoom(bool isRight)
-    {
-        Room nextRoom = room.Instance() as Room;
-        Owner.AddChild(nextRoom);
-        nextRoom.GlobalTransform = GlobalTransform;
+    private bool isAbleToGenerate = true;
+    
+    [Export] public bool isRight;
+    [Export] public bool isStartRoom;
 
-        nextRoom.isRightOrLeftPlayerComing = true;
-        
-        if (isRight)
+    private Room nRoom;
+
+    public override void _Ready()
+    {
+        /*if (!isStartRoom)
         {
-            nextRoom.GlobalPosition = new Vector2(nextRoom.GlobalPosition.x + 330, nextRoom.GlobalPosition.y);
-            nextRoom.isRightPlayerComing = true;
-            nextRoom.GetNode<Position2D>("doorway1").QueueFree();
-        }
-        else
-        {
-            nextRoom.GlobalPosition = new Vector2(nextRoom.GlobalPosition.x - 330, nextRoom.GlobalPosition.y);
-            nextRoom.isRightPlayerComing = false;
-            nextRoom.GetNode<Position2D>("doorway2").QueueFree();
-        }
+            if (isRight) GlobalPosition = new Vector2(GlobalPosition.x + 330, GlobalPosition.y);
+            else GlobalPosition = new Vector2(GlobalPosition.x - 330, GlobalPosition.y);
+        }*/
         
+        if (room == null)
+        {
+            room = ResourceLoader.Load<PackedScene>("res://Rooms/Room" + (GD.Randi() % 2) + ".tscn");
+        }
+    }
+
+    private void GenerateNextRoom()
+    {
+        GD.Print(Name);
+        GD.Print(room);
+        Room nextRoom = (Room) room.Instance();
+        //Owner.AddChild(nextRoom);
+        GD.Print(nextRoom);
+        CallDeferred("add_child", nextRoom);
+        nRoom = nextRoom;
+        nextRoom.isAbleToGenerate = false;
+
+        nextRoom.isRight = isRight;
+        
+        Connect("tree_entered", this, nameof(SetTransform));
+
         GD.Print("generated");
+
+        DelayMethod(nextRoom);
     }
 
-    private void _on_detectionZoneLeft_body_entered(object body)
+    private void SetTransform()
     {
+        GD.Print("isRight " + isRight);
+        nRoom.GlobalTransform = GlobalTransform;
+        
+        if (isRight) nRoom.GlobalPosition = new Vector2(nRoom.GlobalPosition.x + 330, nRoom.GlobalPosition.y);
+        else nRoom.GlobalPosition = new Vector2(nRoom.GlobalPosition.x - 330, nRoom.GlobalPosition.y);
+    }
+    
+    private async void DelayMethod(Room nextRoom)
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(500));
+        GD.Print("1 second delay!");
+        nextRoom.isAbleToGenerate = true;
+    }
+
+    private void _on_detectionZone_body_entered(object body)
+    {
+        //GD.Print(isAbleToGenerate);
+        
+        if (!isAbleToGenerate) return;
+        
         if (body is PlayerController)
         {
-            if (isRightOrLeftPlayerComing && !isRightPlayerComing) return;
-            
-            GenerateNextRoom(false);
+            isAbleToGenerate = false;
+            GenerateNextRoom();
         }
-    }
-
-    private void _on_detectionZoneRight_body_entered(object body)
-    {
-        if (body is PlayerController)
-        {
-            if (isRightOrLeftPlayerComing && isRightPlayerComing) return;
-            
-            GenerateNextRoom(true);
-        } 
+        
+        GD.Print("bruh2");
     }
 }
