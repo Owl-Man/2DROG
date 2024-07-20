@@ -23,7 +23,7 @@ public class Room : TileMap
         
         if (room == null)
         {
-            room = ResourceLoader.Load<PackedScene>("res://Rooms/Room" + (GD.Randi() % 3) + ".tscn");
+            room = ResourceLoader.Load<PackedScene>("res://Rooms/Room" + (GD.Randi() % 4) + ".tscn");
         }
     }
 
