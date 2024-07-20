@@ -239,7 +239,7 @@ public class PlayerController : KinematicBody2D
 	public void TakeDamage()
 	{
 		health -= 1;
-		_velocity = MoveAndSlide(new Vector2(500 * -facingDirection, -80), Vector2.Up);
+		_velocity = MoveAndSlide(new Vector2(700 * -facingDirection, -80), Vector2.Up);
 		_isTakingDamage = true;
 		animatedSprite.Play("takeDamage");
 		GD.Print(health);
