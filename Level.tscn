@@ -17,8 +17,6 @@ radius = 120.0
 [node name="Level" type="Node2D"]
 
 [node name="StartRoom" parent="." instance=ExtResource( 2 )]
-isRight = true
-isStartRoom = true
 
 [node name="Map" type="Node2D" parent="."]
 

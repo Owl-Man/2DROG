@@ -7,20 +7,11 @@ public class Room : TileMap
     [Export] public PackedScene room;
 
     private bool isAbleToGenerate = true;
-    
-    [Export] public bool isRight;
-    [Export] public bool isStartRoom;
 
     private Room nRoom;
 
     public override void _Ready()
     {
-        /*if (!isStartRoom)
-        {
-            if (isRight) GlobalPosition = new Vector2(GlobalPosition.x + 330, GlobalPosition.y);
-            else GlobalPosition = new Vector2(GlobalPosition.x - 330, GlobalPosition.y);
-        }*/
-        
         if (room == null)
         {
             room = ResourceLoader.Load<PackedScene>("res://Rooms/Room" + (GD.Randi() % 4) + ".tscn");
@@ -38,8 +29,6 @@ public class Room : TileMap
         nRoom = nextRoom;
         nextRoom.isAbleToGenerate = false;
 
-        nextRoom.isRight = isRight;
-        
         Connect("tree_entered", this, nameof(SetTransform));
 
         GD.Print("generated");
@@ -49,17 +38,15 @@ public class Room : TileMap
 
     private void SetTransform()
     {
-        GD.Print("isRight " + isRight);
         nRoom.GlobalTransform = GlobalTransform;
         
-        if (isRight) nRoom.GlobalPosition = new Vector2(nRoom.GlobalPosition.x + 330, nRoom.GlobalPosition.y);
-        else nRoom.GlobalPosition = new Vector2(nRoom.GlobalPosition.x - 330, nRoom.GlobalPosition.y);
+        nRoom.GlobalPosition = new Vector2(nRoom.GlobalPosition.x + 752, nRoom.GlobalPosition.y);
     }
     
     private async void DelayMethod(Room nextRoom)
     {
         await Task.Delay(TimeSpan.FromMilliseconds(500));
-        GD.Print("1 second delay!");
+        GD.Print("delay generate");
         nextRoom.isAbleToGenerate = true;
     }
 
