@@ -34,6 +34,11 @@ public class PlayerController : KinematicBody2D
 	private AnimatedSprite animatedSprite;
 
 	[Export] public PackedScene GhostPLayerInstance;
+	
+	public delegate void UpdateScore(int score);
+	public event UpdateScore uScore;
+	
+	private int score = -1;
 
 	public override void _Ready()
 	{
@@ -258,5 +263,11 @@ public class PlayerController : KinematicBody2D
 		{
 			GetTree().ReloadCurrentScene();
 		}
+	}
+
+	public void AddScore()
+	{
+		score++;
+		uScore?.Invoke(score);
 	}
 }

@@ -1,7 +1,9 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=7 format=2]
 
+[ext_resource path="res://UI.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Rooms/StartRoom.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Prefabs/Player.tscn" type="PackedScene" id=3]
+[ext_resource path="res://pa_font1.tres" type="DynamicFont" id=4]
 
 [sub_resource type="SpriteFrames" id=13]
 animations = [ {
@@ -36,3 +38,22 @@ frames = SubResource( 13 )
 shape = SubResource( 12 )
 
 [node name="Projectile" type="Position2D" parent="Node2D"]
+
+[node name="Label" type="Label" parent="."]
+margin_left = -80.0
+margin_top = -192.0
+margin_right = 316.0
+margin_bottom = -99.0
+custom_fonts/font = ExtResource( 4 )
+text = "WASD - move
+SHIFT - dash
+C - climb
+SPACE - jump/walljump"
+align = 2
+valign = 1
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="UI" parent="CanvasLayer" instance=ExtResource( 1 )]
+anchor_right = 0.0
+anchor_bottom = 0.0

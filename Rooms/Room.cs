@@ -56,10 +56,12 @@ public class Room : TileMap
         
         if (!isAbleToGenerate) return;
         
-        if (body is PlayerController)
+        if (body is PlayerController pc)
         {
             isAbleToGenerate = false;
             GenerateNextRoom();
+
+            pc.AddScore();
         }
         
         GD.Print("bruh2");

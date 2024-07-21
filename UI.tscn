@@ -1,0 +1,37 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://pa_font2.tres" type="DynamicFont" id=1]
+[ext_resource path="res://UI.cs" type="Script" id=2]
+
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0.301961, 0.301961, 0.301961, 1 )
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_width_bottom = 6
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_offset = Vector2( 0, 4.29 )
+
+[node name="UI" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 2 )
+
+[node name="Panel" type="Panel" parent="."]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 120.0
+margin_bottom = 64.0
+custom_styles/panel = SubResource( 1 )
+
+[node name="Label" type="Label" parent="Panel"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 104.0
+margin_bottom = 48.0
+custom_fonts/font = ExtResource( 1 )
+text = "exp: "
+valign = 1
